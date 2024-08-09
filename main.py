@@ -13,6 +13,13 @@ symbol_count={
     "D":8
 
 }
+symbol_value={
+    "A":5, # more rare the symbol is the higher your bet gets multiplied
+    "B":4,
+    "C":3,
+    "D":2
+
+}
 #generate the values
 #all symboles list
 def get_slot_machine_spin(rows,cols,symbols):
@@ -41,6 +48,27 @@ def print_slot_machine(columns): #transposing- coz we have a matrix
             else:
                 print(column[row],end='')# otherwise max index also gonna print | this
         print() #goes to the next line
+        # 1 line = top
+        #2 =top+middle
+        #3= all 3 lines
+        # check how much user won
+def check_winnings(columns,lines,bet,values):
+    # look through only the rows/lines they bet on
+    winnings=0
+    winning_lines=[]
+    for line in range(lines): # lines=2 -> line 0 and 1, looping throu ever row/ checking user bet on
+        #every single symbol in the line/row is the same
+        symbol=columns[0][line] # the symbol we need to check is whatever the symbol in the first column,columns 0 -> we have all the columns not the rows
+        for column in columns:# loops through every single column and check for that symbol
+            symbol_to_check = column[line] # column at the current row we're looking/column 1st row/simbol/line
+            if symbol!=symbol_to_check: #if the symbles are not the same we break and go to the 1st for loop and check the next line
+                break# if we found one of the symbols not equels to previous symbol
+        else:
+            winnings+=values[symbol]*bet # bet on each line not the total bet/ coz they could win one line and loose other line
+            winning_lines.append(line+1) # what line they won / line only gonna give index that's why we add 1
+    return winnings,winning_lines
+
+
 
 def deposit():
     while True: # continusely ask the user to input a valied amount
@@ -83,9 +111,7 @@ def get_bet():
             print("Please enter a valied number!")
     return amount
 
-
-def main():
-    balance=deposit()
+def spin(balance): # check the balance if user make a bet
     lines=get_number_of_lines()
     while True:
         bet=get_bet()
@@ -100,4 +126,35 @@ def main():
 # generate the slot machine
     slots=get_slot_machine_spin(ROWS,COLUMNS,symbol_count)# slots = columns= what in the each slot
     print_slot_machine(slots)
+    winnings,winning_lines=check_winnings(slots,lines,bet,symbol_value)
+    print(f"You won ${winnings}")
+    print(f"You won on lines: ", *winning_lines) # unpack operator/ if user won 2 -> 1 2/ didn't win any it's not gonna say anything
+    return winnings-total_bet # how much they won or lost from one instance
+def main():
+    balance=deposit() # this is gonna stay same but below code should run continuesly, and reduce from the balance
+    while True:
+        print(f"current balance is ${balance}")
+        answer=input(f"Press enter to play or 'q' to quit.")
+        if answer == 'q':
+            break
+        balance+=spin(balance)
+    print(f"You left with $ {balance}")
+#     lines=get_number_of_lines()
+#     while True:
+#         bet=get_bet()
+#         total_bet=bet*lines
+#         if total_bet>balance:
+#             print(f"You do not have enough to bet that amount, your current balance is ${balance} ")
+#         else:
+#             break
+
+#     print(f"You're betting ${bet} on {lines} lines. The total bet is equal to: ${total_bet}")
+   
+# # generate the slot machine
+#     slots=get_slot_machine_spin(ROWS,COLUMNS,symbol_count)# slots = columns= what in the each slot
+#     print_slot_machine(slots)
+#     winnings,winning_lines=check_winnings(slots,lines,bet,symbol_value)
+#     print(f"You won ${winnings}")
+#     print(f"You won on lines: ", *winning_lines) # unpack operator/ if user won 2 -> 1 2/ didn't win any it's not gonna say anything
+
 main()
